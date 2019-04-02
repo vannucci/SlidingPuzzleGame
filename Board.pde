@@ -14,7 +14,8 @@ class Board {
    float pieceEdge = 100.0;
    int numberOfPieces = 11;
    int boardWidth = 3;
-   int boardHeight = 4;
+   int boardHeight = 3;
+   float padding = 5.0;
 
  
    Board() { //<>//
@@ -25,9 +26,9 @@ class Board {
        for(int i = 0; i < boardWidth; i++) {
         for(int j = 0; j < boardHeight; j++) {
           if(counter != numberOfPieces) {
-            board[i][j] = new Piece( str(counter), pieceEdge, (float) pieceEdge * i, (float) pieceEdge * j);
+            board[i][j] = new Piece( str(counter), (float) pieceEdge - padding, (float) pieceEdge * i, (float) pieceEdge * j);
           } else {
-            board[i][j] = new Piece( " ", pieceEdge, (float) pieceEdge * i, (float) pieceEdge * j);
+            board[i][j] = new Piece( " ", (float) pieceEdge - padding, (float) pieceEdge * i, (float) pieceEdge * j);
           }
           counter++;
         }
@@ -36,9 +37,10 @@ class Board {
    }
    
    void display() {
+     translate(100,100);
      fill(0);
      stroke(255);
-     rect(0,0,(float) pieceEdge*boardWidth + 5,(float) pieceEdge*boardHeight + 5); //<>//
+     rect(0,0,(float) pieceEdge * boardWidth,(float) pieceEdge * boardWidth); //<>//
      println(pieceEdge*boardWidth + " " + pieceEdge*boardHeight);
      for(int i = 0; i < boardWidth; i++) {
         for(int j = 0; j < boardHeight; j++) {
