@@ -14,7 +14,7 @@ class Piece {
   }
   
   //show function to draw a piece
-  void display(int x, int y, int fillColor) {
+  void display(int fillColor) {
     fill(fillColor);
     stroke(255);
     rectMode(RADIUS);

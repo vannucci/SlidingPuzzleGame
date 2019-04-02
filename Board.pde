@@ -9,8 +9,9 @@ class Board {
  //A function to shuffle the pieces
  //A success function when all the pieces are in the proper order
  
+ //Base size of pieces off of the total size of the board
    Piece[][] board;
-   int pieceEdge = 10;
+   float pieceEdge = 100.0;
    int numberOfPieces = 11;
    int boardWidth = 3;
    int boardHeight = 4;
@@ -24,9 +25,9 @@ class Board {
        for(int i = 0; i < boardWidth; i++) {
         for(int j = 0; j < boardHeight; j++) {
           if(counter != numberOfPieces) {
-            board[i][j] = new Piece((str) counter, (float) pieceEdge, (float) i*boardWidth, (float) j*boardHeight);
+            board[i][j] = new Piece( str(counter), pieceEdge, (float) pieceEdge * i, (float) pieceEdge * j);
           } else {
-            board[i][j] = new Piece((str) ' ',pieceEdge);
+            board[i][j] = new Piece( " ", pieceEdge, (float) pieceEdge * i, (float) pieceEdge * j);
           }
           counter++;
         }
@@ -37,12 +38,13 @@ class Board {
    void display() {
      fill(0);
      stroke(255);
-     rect(0,0,pieceEdge*boardWidth,pieceEdge*boardHeight); //<>//
-      for(int i = 0; i < boardWidth; i++) {
+     rect(0,0,(float) pieceEdge*boardWidth + 5,(float) pieceEdge*boardHeight + 5); //<>//
+     println(pieceEdge*boardWidth + " " + pieceEdge*boardHeight);
+     for(int i = 0; i < boardWidth; i++) {
         for(int j = 0; j < boardHeight; j++) {
-          board[i][j].display(i*pieceEdge,j*pieceEdge, 255);
+          board[i][j].display(255);
         }
-       }
+      }
 
    }
    
