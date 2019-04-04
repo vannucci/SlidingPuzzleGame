@@ -12,68 +12,55 @@ class Board {
  //Base size of pieces off of the total size of the board
    Piece[][] board;
    float pieceWidth = 100.0;
-   int numberOfPieces = 9;
+   int xpos, ypos;
    int boardWidth = 3;
    float padding = 5.0;
    int left;
    int right;
    int down;
    int up;
+   float boardEdgeLength = pieceWidth * boardWidth;
 
 
  
-   Board() { //<>//
+   Board() {
        //For now the size of the board and number of pieces is hardcoded. Make dynamic later.
        board = new Piece[boardWidth][boardWidth];
-       
+       xpos = 0;
+       ypos = 0;
        int counter = 1;
-       for(int j = 0; j < boardWidth; j++) {
-        for(int i = 0; i < boardWidth; i++) {
-          if(counter != numberOfPieces) {
-            board[i][j] = new Piece(
-              counter, 
-              (float) pieceWidth - padding, //width and height of each piece
-              (float) pieceWidth * i + (pieceWidth/2.0), //x location, start from zero, go i times width over, then add in half width to center
-              (float) pieceWidth * j + (pieceWidth/2.0), ////y location, start from zero, go i times width down, then add in half width to center
+       for(int i = 0; i < boardWidth; i++) { //<>//
+        for(int j = 0; j < boardWidth; j++) {
+          if(counter != sq(boardWidth)) {
+            board[j][i] = new Piece(
+              str(counter), 
+              pieceWidth,
+              j,
               i,
-              j
+              255
             );
           } else {
-            board[i][j] = new Piece(
-              0, //blank space to represent empty spot
-              (float) pieceWidth - padding, //width and height of each piece
-              (float) pieceWidth * i + (pieceWidth/2.0), //x location, start from zero, go i times width over, then add in half width to center
-              (float) pieceWidth * j + (pieceWidth/2.0), ////y location, start from zero, go i times width down, then add in half width to center
+            board[j][i] = new Piece(
+              "0", 
+              pieceWidth,
+              j,
               i,
-              j
+              0
             );
           }
           counter++;
+          xpos += 1;
         }
+        xpos = 0;
+        ypos += 1;
        }
        
    }
    
-   Piece findPieceByKey(char code) {
-    for(int j = 0; j < boardWidth; j++) {
-      for(int i = 0; i < boardWidth; i++) {
-          if(board[i][j].value == code) {
-           return board[i][j]; 
-          }
-      }
-    }
-    
-    return null; //this could cause me some problems, just watch #foreshadowing
-  
-   }
-   
    void display() {
-     background(255);
-     fill(0); //black background with white tiles
-     rect(0,0,(float) pieceWidth * boardWidth,(float) pieceWidth * boardWidth); //top left corner is at 0,0, then bottom right is at tile edge length times tiles
-     for(int j = 0; j < boardWidth; j++) {
-        for(int i = 0; i < boardWidth; i++) {
-          board[i][j].display(255); //display each of the tiles
+     for(int i = 0; i < boardWidth; i++) {
+        for(int j = 0; j < boardWidth; j++) {
+          board[j][i].display(); //display each of the tiles
         }
       }
 
@@ -99,54 +86,39 @@ class Board {
    //with an animation
    //if not, do nothing
    //Notes: I don't like the way this thing looks, as of right now, this should be a first target for refactor
-   void slideTile(Piece target) {
-     Piece temp;
-     println(target.i);
-     println(target.j);
-     if(target.i - 1 < 0)            { left = target.i; } else { left = target.i - 1; }
-     if(target.i + 1 >= boardWidth)   { right = target.i; } else { right = target.i + 1; }
-     if(target.j - 1 < 0)            { down = target.j; } else { down = target.j - 1; }
-     if(target.j + 1 >= boardWidth)   { up = target.j; } else { up = target.j + 1; }
-     if(board[left][target.j].value == '0') {
-      switchTiles("left") 
-     } else if(board[target.i][down].value == '0') {
-      switchTiles("down");
-     } else if(board[right][target.j].value == '0') {
-       switchTiles("right");
-     } else if(board[target.i][up].value == '0') {
-       switchTiles("up");
-     }
-     //if( 
-     //    board[left][target.j].value == '0' || //look left
-     //    board[target.i][down].value == '0' || //look down
-     //    board[right][target.j].value == '0' || //look right
-     //    board[target.i][up].value == '0'    //look up
-     //    ) {
-     //      //switch the two pieces
-     //   temp = board[target.i-1][target.j];
-     //   board[target.i-1][target.j] = board[target.i][target.j];
-     //   board[target.i][target.j] = temp;
-     // }
-
+  void slideTile(int x, int y) {
+       int pos[][] = {{-1,0},{1,0},{0,1},{0,-1}};
+       int xi, yi;
+       for (int[] i: pos) {
+         //test the tiles around the target tile, adding in all possible directions to the target
+         xi = x + i[1];
+         yi = y + i[0];
+        if(inbound(xi,yi)) {          
+           if(board[yi][xi].value.equals("0") && board[y][x].value != "0") {
+             board[yi][xi].moveTile(x,y);
+             board[y][x].moveTile(xi,yi);
+           }
+         }
+       }
+  
+   }
+ 
+ Boolean inbound(int x, int y) {
+   if(x >= 0 && x < boardWidth && y >= 0 && y < boardWidth) {
+     return true;
+   }
+   return false;
  }
  
- void switchTiles(String direction) {
-  switch(direction) {
-    case "up":
-    
-      break;
-    case "down":
-    
-      break;
-    case "right":
-    
-      break;
-    case "left":
-    
-      break;
-    default:
-      //Do nothing
-      break;
+ //The actual switching of the tiles is contained here, so as to not bloat the slide tile function
+ void switchTiles(int targetx, int targety, int blankx, int blanky) {
+
+   //println(board[targety][targetx].value);
+   //println(board[blanky][blankx].value);
+   //String temp = board[targety][targetx].value;
+   //board[targety][targetx].setVal(board[blanky][blankx].value);
+   //board[blanky][blankx].setVal(temp);
+
  }
    
    //Win
@@ -158,9 +130,9 @@ class Board {
    
    Boolean WinTest() {
      int counter = 1;
-     for(int j = 0; j < boardWidth; j++) {
-        for(int i = 0; i < boardWidth; i++) {
-          if (board[i][j].value != (char) counter) {
+     for(int i = 0; i < boardWidth; i++) {
+        for(int j = 0; j < boardWidth; j++) {
+          if (board[j][i].value != str(counter)) {
             return false;
           }
         }
