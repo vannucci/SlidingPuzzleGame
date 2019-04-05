@@ -1,6 +1,4 @@
 class Piece {
- //Pieces just know their number, and their size
- //An integer of the piece's value
   String value;
   float size;
   float padding = 5.0;
@@ -23,7 +21,6 @@ class Piece {
 
   }
   
-  //Moving tiles is still a problem; I don't understand why they kee getting set to zero...
   void moveTile(int newI,int newJ) {
     i = newI;
     j = newJ;
@@ -31,7 +28,6 @@ class Piece {
     y = newJ * pieceWidth + (pieceWidth / 2.0);
   }
   
-  //show function to draw a piece
   void display() {
     fill(fillColor);
     stroke(strokeColor);
