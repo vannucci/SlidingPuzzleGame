@@ -12,7 +12,6 @@ class Board {
  //Base size of pieces off of the total size of the board
    Piece[][] board;
    float pieceWidth = 100.0;
-   int xpos, ypos;
    int boardWidth = 3;
    float padding = 5.0;
    int left;
@@ -20,16 +19,16 @@ class Board {
    int down;
    int up;
    float boardEdgeLength = pieceWidth * boardWidth;
+   int[] properOrder;
 
 
  
    Board() {
        //For now the size of the board and number of pieces is hardcoded. Make dynamic later.
        board = new Piece[boardWidth][boardWidth];
-       xpos = 0;
-       ypos = 0;
+       properOrder = new int[(int) sq(boardWidth) - 1];
        int counter = 1;
-       for(int i = 0; i < boardWidth; i++) { //<>//
+       for(int i = 0; i < boardWidth; i++) {
         for(int j = 0; j < boardWidth; j++) {
           if(counter != sq(boardWidth)) {
             board[j][i] = new Piece(
@@ -49,10 +48,7 @@ class Board {
             );
           }
           counter++;
-          xpos += 1;
         }
-        xpos = 0;
-        ypos += 1;
        }
        
    }
@@ -66,26 +62,33 @@ class Board {
 
    }
    
-   //Scramble
-   //When the game is started, the board is scrambled
-   //This involves picking a random tile and calling 'slide'
-   //if it fails, then the failure is ignored and another is called
-   //This is repeated a set number of times
-   //Is there a better way to scramble the board?
-   
-   //MousePickTile
-   //This function handles the input from the user and passes to slide tile
-   //the tile the user wants to slide. It either interprets the mouse position
-   //as a tile, or it casts and passes the user's keyboard input to Slide Tile
-   
-   
-   //SlideTile
-   //This function will be passed a (location? tile?), and will check
-   //if one of the adjacent tiles is empty
-   //if one is, then the target tile and the empty tile switch places
-   //with an animation
-   //if not, do nothing
-   //Notes: I don't like the way this thing looks, as of right now, this should be a first target for refactor
+  void scramble() {
+    for(int s = 0; s < 2; s++) {
+      int xi, yi;
+      int[][]  pos= {{-1,0},{1,0},{0,1},{0,-1}};
+
+      int[] choice = pos[int(random(4))];
+
+
+      for(int i = 0; i < boardWidth; i++) {
+        for(int j = 0; j < boardWidth; j++) {
+          if(board[j][i].value.equals("0")) {
+              xi = i + choice[1];
+              yi = j + choice[0];
+              if(inbound(xi,yi)) {
+                 board[yi][xi].moveTile(i,j);
+                 board[j][i].moveTile(xi,yi);
+                 switchTiles(i,j,xi,yi);
+              }
+
+          }
+          board[j][i].display(); //display each of the tiles
+        }
+      }
+    }
+
+  }
+      
   void slideTile(int x, int y) {
        int pos[][] = {{-1,0},{1,0},{0,1},{0,-1}};
        int xi, yi;
@@ -97,6 +100,8 @@ class Board {
            if(board[yi][xi].value.equals("0") && board[y][x].value != "0") {
              board[yi][xi].moveTile(x,y);
              board[y][x].moveTile(xi,yi);
+             switchTiles(x,y,xi,yi);
+
            }
          }
        }
@@ -112,12 +117,9 @@ class Board {
  
  //The actual switching of the tiles is contained here, so as to not bloat the slide tile function
  void switchTiles(int targetx, int targety, int blankx, int blanky) {
-
-   //println(board[targety][targetx].value);
-   //println(board[blanky][blankx].value);
-   //String temp = board[targety][targetx].value;
-   //board[targety][targetx].setVal(board[blanky][blankx].value);
-   //board[blanky][blankx].setVal(temp);
+   Piece temp = board[targety][targetx];
+   board[targety][targetx] = board[blanky][blankx];
+   board[blanky][blankx] = temp;
 
  }
    
@@ -130,11 +132,12 @@ class Board {
    
    Boolean WinTest() {
      int counter = 1;
-     for(int i = 0; i < boardWidth; i++) {
+     for(int i = 0; i < boardWidth; i++) { //<>//
         for(int j = 0; j < boardWidth; j++) {
-          if (board[j][i].value != str(counter)) {
-            return false;
-          }
+          println(board[j][i].value);
+          //if (board[i][j].value != str(counter)) {
+          //  return false;
+          //}
         }
       }
 

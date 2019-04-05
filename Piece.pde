@@ -29,12 +29,11 @@ class Piece {
     j = newJ;
     x = newI * pieceWidth + (pieceWidth / 2.0);
     y = newJ * pieceWidth + (pieceWidth / 2.0);
-    println(newI,newJ,value);
   }
   
   //show function to draw a piece
   void display() {
-    fill(fillColor); //<>//
+    fill(fillColor);
     stroke(strokeColor);
     rectMode(CENTER);
     rect(x, y, size, size);
